@@ -2,9 +2,9 @@ name: Azure Deployment
 
 on:
   push:
-    branches: [ main ]
+    branches: [ master ]
   pull_request:
-    branches: [ main ]
+    branches: [ master ]
 
 env:
   AZURE_WEBAPP_NAME: azure-test-app
