@@ -8,23 +8,23 @@ namespace Backend.Controllers;
 public class HealthController : ControllerBase
 {
     private readonly IDataVerseService _dataVerseService;
+    private readonly IWebHostEnvironment _environment;
 
-    public HealthController(IDataVerseService dataVerseService)
+    public HealthController(IDataVerseService dataVerseService, IWebHostEnvironment environment)
     {
         _dataVerseService = dataVerseService;
+        _environment = environment;
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetHealth()
+    public ActionResult GetHealth()
     {
-        var health = new
+        return Ok(new
         {
             Status = "Healthy",
             Timestamp = DateTime.UtcNow,
-            Environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown"
-        };
-
-        return Ok(health);
+            Environment = _environment.EnvironmentName
+        });
     }
 
     [HttpGet("dataverse")]

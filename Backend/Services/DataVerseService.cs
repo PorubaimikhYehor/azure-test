@@ -19,7 +19,7 @@ public class DataVerseService : IDataVerseService
         _configuration = configuration;
     }
 
-    public async Task<ServiceClient> GetServiceClientAsync()
+    public Task<ServiceClient> GetServiceClientAsync()
     {
         if (_serviceClient == null)
         {
@@ -38,7 +38,7 @@ public class DataVerseService : IDataVerseService
             }
         }
 
-        return _serviceClient;
+        return Task.FromResult(_serviceClient);
     }
 
     public async Task<bool> TestConnectionAsync()
