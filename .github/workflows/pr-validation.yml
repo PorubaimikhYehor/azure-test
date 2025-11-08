@@ -1,0 +1,89 @@
+name: PR Validation
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Pull Request
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.0.x'
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: Frontend/package-lock.json
+    
+    - name: Restore .NET dependencies
+      run: dotnet restore Backend/Backend.csproj
+    
+    - name: Build .NET application
+      run: dotnet build Backend/Backend.csproj --configuration Release --no-restore
+    
+    - name: Run .NET tests
+      run: dotnet test Backend/Backend.csproj --no-build --configuration Release --verbosity normal --collect:"XPlat Code Coverage" --results-directory ./coverage
+    
+    - name: Install Angular dependencies
+      working-directory: Frontend
+      run: npm ci
+    
+    - name: Lint Angular application
+      working-directory: Frontend
+      run: npm run lint
+    
+    - name: Build Angular application
+      working-directory: Frontend
+      run: npm run build
+    
+    - name: Test Angular application with coverage
+      working-directory: Frontend
+      run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
+    
+    - name: Upload .NET coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./coverage
+        flags: backend
+        name: backend-coverage
+    
+    - name: Upload Angular coverage reports to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        directory: ./Frontend/coverage
+        flags: frontend
+        name: frontend-coverage
+    
+    - name: Docker Build Test - Backend
+      run: docker build -t test-backend ./Backend
+    
+    - name: Docker Build Test - Frontend
+      run: docker build -t test-frontend ./Frontend
+    
+    - name: Security scan - Backend
+      uses: securecodewarrior/github-action-add-sarif@v1
+      with:
+        sarif-file: 'backend-security-scan.sarif'
+        check-name: 'Backend Security Scan'
+        token: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true
+    
+    - name: Comment PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '✅ All validation checks passed! Ready for review.'
+          })
