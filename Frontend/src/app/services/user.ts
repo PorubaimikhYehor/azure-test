@@ -33,3 +33,5 @@ export class UserService {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
 }
+
+export { UserService as User };

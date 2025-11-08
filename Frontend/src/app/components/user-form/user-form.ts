@@ -151,3 +151,5 @@ export class UserFormComponent implements OnInit {
     return labels[fieldName] || fieldName;
   }
 }
+
+export { UserFormComponent as UserForm };

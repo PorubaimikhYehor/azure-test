@@ -80,3 +80,5 @@ export class UserListComponent implements OnInit {
     this.router.navigate(['/user-form']);
   }
 }
+
+export { UserListComponent as UserList };
