@@ -80,8 +80,6 @@ jobs:
         tags: |
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-backend:latest
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-backend:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
     
     - name: Build and push Frontend Docker image
       uses: docker/build-push-action@v5
@@ -92,8 +90,6 @@ jobs:
         tags: |
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:latest
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:${{ github.sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
     
     - name: Login to Azure
       uses: azure/login@v1
