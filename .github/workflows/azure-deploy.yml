@@ -91,46 +91,8 @@ jobs:
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:latest
           ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:${{ github.sha }}
     
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-    
-    - name: Deploy to Azure Container Instances
-      uses: azure/aci-deploy@v1
-      with:
-        resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
-        dns-name-label: azure-test-backend-${{ github.sha }}
-        image: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-backend:${{ github.sha }}
-        registry-login-server: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
-        registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-        registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-        name: azure-test-backend
-        ports: 8080
-        location: ${{ env.AZURE_LOCATION }}
-        environment-variables: |
-          ASPNETCORE_ENVIRONMENT=Production
-          ASPNETCORE_URLS=http://+:8080
-        secure-environment-variables: |
-          DataVerse__ServiceUrl=${{ secrets.DATAVERSE_SERVICE_URL }}
-          DataVerse__ClientId=${{ secrets.DATAVERSE_CLIENT_ID }}
-          DataVerse__ClientSecret=${{ secrets.DATAVERSE_CLIENT_SECRET }}
-          DataVerse__TenantId=${{ secrets.DATAVERSE_TENANT_ID }}
-    
-    - name: Deploy Frontend to Azure Container Instances
-      uses: azure/aci-deploy@v1
-      with:
-        resource-group: ${{ env.AZURE_RESOURCE_GROUP }}
-        dns-name-label: azure-test-frontend-${{ github.sha }}
-        image: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:${{ github.sha }}
-        registry-login-server: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}
-        registry-username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
-        registry-password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
-        name: azure-test-frontend
-        ports: 80
-        location: ${{ env.AZURE_LOCATION }}
-    
-    - name: Get deployment URLs
+    - name: Show deployed images
       run: |
-        echo "Backend URL: http://azure-test-backend-${{ github.sha }}.${{ env.AZURE_LOCATION }}.azurecontainer.io:8080"
-        echo "Frontend URL: http://azure-test-frontend-${{ github.sha }}.${{ env.AZURE_LOCATION }}.azurecontainer.io"
+        echo "Backend image pushed: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-backend:${{ github.sha }}"
+        echo "Frontend image pushed: ${{ secrets.AZURE_REGISTRY_LOGIN_SERVER }}/azure-test-frontend:${{ github.sha }}"
+        echo "Now create Container Instances manually in Azure Portal using these images"
